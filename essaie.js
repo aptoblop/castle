@@ -95,15 +95,18 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
 
     });
 
-      /*  console.log(tab[0]);
-        console.log(tab [1]);
-        console.log(tab [2]);
-        console.log(tab [3]);
-        console.log(tab[tab.length-1]);
-*/
+
+    for(var i=0;i<tab.length;i+=1){
+        tab[i]=tab[i].trim();
+    }
+
+
+
     
   }
 });
+
+
 
 
 
