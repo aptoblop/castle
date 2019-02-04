@@ -83,6 +83,7 @@ for(var i; i<json.length;i+=1){
 
 request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) {
   if (!error && response.statusCode == 200) {
+      console.log("salut à toi brave voyageur");
     var $ = cheerio.load(html);
    // var blop = cheerioAdv.select($,'#countryF');
    var tab=[];
@@ -95,17 +96,48 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
 
     });
 
+    var tabjson=[];
+for(var i=0;i<tab.length;i+=1){
+    tab[i]=tab[i].trim();
+}
 
-    for(var i=0;i<tab.length;i+=1){
-        tab[i]=tab[i].trim();
+    for(var i=2;i<tab.length;){
+
+
+        if(tab[i+2].match('Maître de maison - ')!=null){
+            tabjson.push(jsoniser(tab[i],tab[i+1],tab[i+2]));
+            i+=3;
+        }
+       else{
+           tabjson.push(jsoniser(tab[i],tab[i+1],null));
+           i+=2;
+       }
+        
+    }
+
+    console.log(tabjson.length);
+
+    for(var i=0;i<tabjson.length;i+=1){
+        console.log(tabjson[i]);
     }
 
 
 
+
+
+
+
+
+console.log("bon vent !")
     
   }
 });
 
+function jsoniser(tab1,tab2,tab3){
+    
+    return JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, nom_maitre_de_maison: tab3 });
+
+}
 
 
 
