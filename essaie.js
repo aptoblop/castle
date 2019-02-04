@@ -45,13 +45,16 @@ let blop = cheerioAdv.find($,'#countryF').text();
 console.log(blop);
 */
 
+/*
 request(adresse,function(err,resp,body){
     
     let tab=[];
 var $= cheerio.load(body);
-let blop = cheerioAdv.find($,'#countryF');
+let blop = cheerioAdv.find($,'#countryF ').html();
 tab.push(blop);
-//console.log(tab[0]);
+console.log(tab[0]);
+console.log(tab[1]);
+});*/
 
 //let blop3=$('#countryF').find('h3:last').text();
 //console.log(blop3);
@@ -70,5 +73,37 @@ for(var i; i<json.length;i+=1){
 }*/
 //console.log(blop[1]['type']);
 
-});
+
 //const chief_selector = 'div.node_poi-chef div.node_poi_description div.field:eq(0) div.even';
+
+
+
+
+ //try trouvé sur stackoverflow
+
+request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) {
+  if (!error && response.statusCode == 200) {
+    var $ = cheerio.load(html);
+   // var blop = cheerioAdv.select($,'#countryF');
+   var tab=[];
+
+    $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
+       // console.log("a" + $(this).text());
+        var newval =$(this).text();
+        tab.push(newval);
+        return tab;
+
+    });
+
+      /*  console.log(tab[0]);
+        console.log(tab [1]);
+        console.log(tab [2]);
+        console.log(tab [3]);
+        console.log(tab[tab.length-1]);
+*/
+    
+  }
+});
+
+
+
