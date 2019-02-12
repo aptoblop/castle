@@ -76,16 +76,14 @@ for(var i; i<json.length;i+=1){
 
 //const chief_selector = 'div.node_poi-chef div.node_poi_description div.field:eq(0) div.even';
 
-
-
-
- //try trouvé sur stackoverflow
-
-request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) {
+request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) 
+{
   if (!error && response.statusCode == 200) {
       console.log("salut à toi brave voyageur");
     var $ = cheerio.load(html);
    // var blop = cheerioAdv.select($,'#countryF');
+
+
    var tab=[];
 
    /* $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
@@ -98,89 +96,82 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
     });
 */
 
-    console.log("-------------bloooooop---------------");
 
     $('h3:contains("France")').next().find('li').each(function(){
+
         let data =$(this);
-        let url=String(data.find("a").first().attr("href"));
-        console.log(url);
+        let adresse=String(data.find("a").first().attr("href"));
+        //console.log(adresse);
 
 
         let nom_chateau= data.find('a').first().text().trim();
-        console.log(nom_chateau);
+        //console.log(nom_chateau);
 
         let nom_chef=data.find('a:contains("Chef")').text().trim()
         nom_chef=nom_chef.replace('Chef - ','');
-        console.log(nom_chef);
+
+
+        var obj ={
+            name_castle: nom_chateau,
+            name_chef: nom_chef,
+            url: adresse,
+            prix:0
+        };
+
+
+        tab.push(obj);
+       // console.log("le chef c est : "+obj.name_chef);
 
 
     });
-  /*  $(this).find('li').each(function getinfo(i,e)
-{
-
-    console.log("blop");
-});*/
-
-
- 
-
-    
 
 
 
 
-    var tabjson=[];
-for(var i=0;i<tab.length;i+=1){
-    tab[i]=tab[i].trim();
+
+
 }
 
-    for(var i=2;i<tab.length;){
+    tabjson=[];
+    for(var i=0;i<tab.length;i+=1)
+        {
 
 
-        if(tab[i+2].match('Maître de maison - ')!=null){
-            tabjson.push(jsoniser(tab[i],tab[i+1],tab[i+2]));
-            i+=3;
-        }
-       else{
-           tabjson.push(jsoniser(tab[i],tab[i+1],null));
-           i+=2;
-       }
-        
-    }
+
+
+            tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,0));
+
+         }
+
+
+         var $2=cheerio.load(tab[0].url)
+         //var test=String($2().find('meta[itemprop="priceRange"]').attr("content"));
+         var test=String($2("#propertyInfo__ratings").find("meta[itemprop='priceRange']").attr("content"));
+         console.log(test);
 
     console.log(tabjson.length);
 
 
 
-/*
-    var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
-    var monFichier=fileSystem.OpenTextFile("jsonRetC.txt",2,true);
 
-    for(var i=0;i<tabjson.length;i+=1){
-        monFichier.WriteLine(tabjson[i]);
+
+
+    console.log("bon vent !")
+
+    for(var i=0; i<tabjson.length;i+=1)
+    {
+        console.log(tabjson[i]);
     }
-
-    monFichier.close();
-
-*/
-
-
-
-
-console.log("bon vent !")
-
-for(var i=0; i<tabjson.length;i+=1){
-    console.log(tabjson[i]);
-}
     
-  }
+  
 });
 
-function jsoniser(tab1,tab2,tab3){
+function jsoniser(tab1,tab2,tab3,tab4){
     
-    return JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, nom_maitre_de_maison: tab3 });
+    return JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
 
 }
+
 
 
 
