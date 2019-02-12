@@ -90,11 +90,37 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
 
     $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
        // console.log("a" + $(this).text());
+      // console.log($(this).attr());
         var newval =$(this).text();
         tab.push(newval);
         return tab;
 
     });
+
+
+    console.log("-------------bloooooop---------------");
+
+    $('h3:contains("France")').next().find('li').each(function(){
+        let data =$(this);
+        let url=String(data.find("a").attr("href"));
+        console.log(url);
+
+        
+
+    });
+  /*  $(this).find('li').each(function getinfo(i,e)
+{
+
+    console.log("blop");
+});*/
+
+
+ 
+
+    
+
+
+
 
     var tabjson=[];
 for(var i=0;i<tab.length;i+=1){
@@ -117,18 +143,28 @@ for(var i=0;i<tab.length;i+=1){
 
     console.log(tabjson.length);
 
+
+
+/*
+    var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
+    var monFichier=fileSystem.OpenTextFile("jsonRetC.txt",2,true);
+
     for(var i=0;i<tabjson.length;i+=1){
-        console.log(tabjson[i]);
+        monFichier.WriteLine(tabjson[i]);
     }
 
+    monFichier.close();
 
-
-
+*/
 
 
 
 
 console.log("bon vent !")
+
+for(var i=0; i<tabjson.length;i+=1){
+    console.log(tabjson[i]);
+}
     
   }
 });
