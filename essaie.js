@@ -88,7 +88,7 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
    // var blop = cheerioAdv.select($,'#countryF');
    var tab=[];
 
-    $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
+   /* $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
        // console.log("a" + $(this).text());
       // console.log($(this).attr());
         var newval =$(this).text();
@@ -96,16 +96,23 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
         return tab;
 
     });
-
+*/
 
     console.log("-------------bloooooop---------------");
 
     $('h3:contains("France")').next().find('li').each(function(){
         let data =$(this);
-        let url=String(data.find("a").attr("href"));
+        let url=String(data.find("a").first().attr("href"));
         console.log(url);
 
-        
+
+        let nom_chateau= data.find('a').first().text().trim();
+        console.log(nom_chateau);
+
+        let nom_chef=data.find('a:contains("Chef")').text().trim()
+        nom_chef=nom_chef.replace('Chef - ','');
+        console.log(nom_chef);
+
 
     });
   /*  $(this).find('li').each(function getinfo(i,e)
