@@ -1,34 +1,4 @@
-//import { request } from 'https';
 
-//import { SSL_OP_TLS_BLOCK_PADDING_BUG } from 'constants';
-
-/*var request=require("request");
-const cheerio = require('cheerio');
-const parse5=require('parse5');
-const jsdom=require('jsdom');
-const rp=require('request-promise');
-var listFrance;
-//https://www.relaischateaux.com/fr/site-map/etablissements;
-
-//var adresse = "https://www.relaischateaux.com/fr/destinations/europe/france";
-rp('https://www.relaischateaux.com/fr/destinations/europe/france').then((html) => {
-
-    var fourChildren=cheerio('#countryF',html).children()
-
-    fourChildren.find('h3').each(function(i,elem){
-        if(cheerio(this).text()=="France"){
-            listFrance=cheerio(this).next();
-        }
-    })
-
-    
-
-})
-//const $ = cheerio.load('https://www.relaischateaux.com/fr/destinations/europe/france');
-//console.log($)
-//console.log("hello world");
-console.log(listFrance)
-*/
 
 var request=require("request");
 var path=require('path');
@@ -38,63 +8,63 @@ const cheerioAdv = require('cheerio-advanced-selectors');
 const fs = require('fs');
 
 
-const adresse = 'https://www.relaischateaux.com/fr/site-map/etablissements';
+//const adresse = 'https://www.relaischateaux.com/fr/site-map/etablissements';
 
-/*let $ = cheerio.load(adresse);
-let blop = cheerioAdv.find($,'#countryF').text();
-console.log(blop);
-*/
+var tab=[];
+var tabjson=[];
 
-/*
-request(adresse,function(err,resp,body){
-    
-    let tab=[];
-var $= cheerio.load(body);
-let blop = cheerioAdv.find($,'#countryF ').html();
-tab.push(blop);
-console.log(tab[0]);
-console.log(tab[1]);
-});*/
-
-//let blop3=$('#countryF').find('h3:last').text();
-//console.log(blop3);
-
-//let blop2=cheerioAdv.find(blop,)
-
-/*
-var html2json = require('html2json').html2json;
-var json = html2json(blop);
-
-console.log(json);
-console.log(json.length);
-
-for(var i; i<json.length;i+=1){
-    console.log();
-}*/
-//console.log(blop[1]['type']);
+const promise1=etape1();
+const promise2=etape2();
+const promise3=etape3();
+promise1.then(promise2,console.log("foiree a l etape 1"));
+promise2.then(promise3,console.log("foiree a l etape 2"));
+promise2.then(console.log("enfin putain !"),console.log("foiree a l etape 3"));
 
 
-//const chief_selector = 'div.node_poi-chef div.node_poi_description div.field:eq(0) div.even';
 
+function etape1 (){
+    return new Promise((resolve, reject) => {
+        scraping1();
+        if (tab.length!=0) {
+          resolve("Réussite");
+        } else {
+          reject("Échec");
+        }
+      })
+}
+
+
+function etape2 (){
+    return new Promise((resolve, reject) => {
+        fillPrice();
+        if (tab.length!=0) {
+          resolve("Réussite");
+        } else {
+          reject("Échec");
+        }
+      })
+}
+
+
+function etape3 (){
+    return new Promise((resolve, reject) => {  
+        faireJson();
+        if (tab.length!=0) {
+          resolve("Réussite");
+        } else {
+          reject("Échec");
+        }
+      })
+}
+
+
+function scraping1()
+{
 request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) 
 {
   if (!error && response.statusCode == 200) {
       console.log("salut à toi brave voyageur");
     var $ = cheerio.load(html);
-   // var blop = cheerioAdv.select($,'#countryF');
-
-
-   var tab=[];
-
-   /* $('#countryF ul[class="listDiamond"] > li > a[href]').each(function getinfo(i,e){
-       // console.log("a" + $(this).text());
-      // console.log($(this).attr());
-        var newval =$(this).text();
-        tab.push(newval);
-        return tab;
-
-    });
-*/
 
 
     $('h3:contains("France")').next().find('li').each(function(){
@@ -118,59 +88,103 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
             prix:0
         };
 
-
         tab.push(obj);
-       // console.log("le chef c est : "+obj.name_chef);
-
-
     });
-
-
-
-
-
 
 }
 
-    tabjson=[];
+});
+}
+
+
+
+
+
+ async function fillPrice (){
+/*
+var promise1=new Promise(function (resolve,reject){
+});*/
+console.log("debut filling price");
+for(var i=0;i<tab.length;i+=1)
+{
+   await request(tab[i].url, async function (error, response, html) 
+    {
+      if (!error && response.statusCode == 200) {
+          console.log("salut à toi brave voyageur");
+        var $ = cheerio.load(html);
+
+        var price= await String($("meta[itemprop='priceRange']").attr("content"));
+
+        //tab[i].prix=test;
+
+        console.log("le premier prix est : "+price);
+        tab[i].prix= await price;
+      }});
+    }
+
+}
+
+function faireJson ()
+{
     for(var i=0;i<tab.length;i+=1)
-        {
+    {
+        tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,tab[i].prix));
+     }
 
 
 
-
-            tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,0));
-
-         }
-
-
-         var $2=cheerio.load(tab[0].url)
-         //var test=String($2().find('meta[itemprop="priceRange"]').attr("content"));
-         var test=String($2("#propertyInfo__ratings").find("meta[itemprop='priceRange']").attr("content"));
-         console.log(test);
 
     console.log(tabjson.length);
-
-
-
-
-
-
-    console.log("bon vent !")
 
     for(var i=0; i<tabjson.length;i+=1)
     {
         console.log(tabjson[i]);
     }
-    
-  
-});
+
+}
+
 
 function jsoniser(tab1,tab2,tab3,tab4){
     
     return JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
 
 }
+
+
+
+async function scrapePage(url) {
+  //  console.log("Fetching page: " + page);
+  
+  /*  let link = url + page;
+    let raw_data = await fetch(link);
+    let data = await raw_data.text();*/
+    let $ = cheerio.load(url);
+  
+    let no_res =  String($("meta[itemprop='priceRange']").attr("content"))//cheerioAdv.find($, 'div.srp-no-results-title');
+   
+  
+   // let cards_url = cheerioAdv.find($, 'a.poi-card-link');
+    let cards = [];
+  
+    for (let i = 0; i < cards_url.length; i++) {
+      let card_url = cards_url[i]['attribs']['href'];
+      let card = await scrapeCard(addr_complement + card_url);
+      cards.push(card);
+    }
+  
+    return cards;
+}
+
+async function scrapeCard(link) {
+    let raw_data = await fetch(link);
+    let data = await raw_data.text();
+    let $ = cheerio.load(data);
+    let card = getAttribs($);
+    return await card;
+  }
+
+
+
 
 
 
