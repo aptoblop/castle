@@ -12,20 +12,23 @@ const fs = require('fs');
 
 var tab=[];
 var tabjson=[];
-
+/*
 const promise1=etape1();
 const promise2=etape2();
 const promise3=etape3();
+
 promise1.then(promise2,console.log("foiree a l etape 1"));
+console.log("tab length: "+tab.length);
+
 promise2.then(promise3,console.log("foiree a l etape 2"));
-promise2.then(console.log("enfin putain !"),console.log("foiree a l etape 3"));
+promise3.then(console.log("enfin putain !"),console.log("foiree a l etape 3"));
 
 
 
 function etape1 (){
     return new Promise((resolve, reject) => {
         scraping1();
-        if (tab.length!=0) {
+        if (tab.length==0) {
           resolve("Réussite");
         } else {
           reject("Échec");
@@ -37,7 +40,7 @@ function etape1 (){
 function etape2 (){
     return new Promise((resolve, reject) => {
         fillPrice();
-        if (tab.length!=0) {
+        if (tab[0].price==0) {
           resolve("Réussite");
         } else {
           reject("Échec");
@@ -49,17 +52,27 @@ function etape2 (){
 function etape3 (){
     return new Promise((resolve, reject) => {  
         faireJson();
-        if (tab.length!=0) {
+        if (tabjson.length==0) {
           resolve("Réussite");
         } else {
           reject("Échec");
         }
       })
 }
+*/
+/*
+scraping1();
+fillPrice();
+faireJson();
+*/
+const file = fs.createWriteStream('D:/ESILV/IBO_1/blop.txt');
+/*file.write('salut toi ');
+file.end('ca biche ?');*/
 
+main();
 
-function scraping1()
-{
+async function main() {
+
 request('https://www.relaischateaux.com/fr/site-map/etablissements', function (error, response, html) 
 {
   if (!error && response.statusCode == 200) {
@@ -85,19 +98,42 @@ request('https://www.relaischateaux.com/fr/site-map/etablissements', function (e
             name_castle: nom_chateau,
             name_chef: nom_chef,
             url: adresse,
-            prix:0
+            prix: 0//getPutaindePrix(adresse)
         };
 
-        tab.push(obj);
+       tab.push(obj);
     });
 
 }
+fillPrice();
+
 
 });
+//await faireJson();
+//toTxt(tabjson[0].price, "D:/ESILV/IBO_1/blop.txt");
+
 }
 
 
 
+function getPutaindePrix(url){
+  var price=6;
+  request(url, async function (error, response, html) 
+  {
+    if (!error && response.statusCode == 200) {
+        //console.log("salut à toi brave voyageur");
+      var $ = await cheerio.load(html);
+
+      price= await String($("meta[itemprop='priceRange']").attr("content"));
+
+      //tab[i].prix=test;
+
+      console.log("le premier prix est : "+price);
+      
+      //tab[i].prix= await price;
+    }});
+return price;
+}
 
 
  async function fillPrice (){
@@ -111,7 +147,7 @@ for(var i=0;i<tab.length;i+=1)
     {
       if (!error && response.statusCode == 200) {
           console.log("salut à toi brave voyageur");
-        var $ = cheerio.load(html);
+        var $ = await cheerio.load(html);
 
         var price= await String($("meta[itemprop='priceRange']").attr("content"));
 
@@ -120,15 +156,16 @@ for(var i=0;i<tab.length;i+=1)
         console.log("le premier prix est : "+price);
         tab[i].prix= await price;
       }});
-    }
+}
+    await faireJson();
 
 }
 
-function faireJson ()
+async function faireJson ()
 {
     for(var i=0;i<tab.length;i+=1)
     {
-        tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,tab[i].prix));
+        await tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,tab[i].prix));
      }
 
 
@@ -144,20 +181,20 @@ function faireJson ()
 }
 
 
-function jsoniser(tab1,tab2,tab3,tab4){
+async function jsoniser(tab1,tab2,tab3,tab4){
     
-    return JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
+    return await JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
 
 }
 
 
-
+/*
 async function scrapePage(url) {
   //  console.log("Fetching page: " + page);
   
-  /*  let link = url + page;
+    let link = url + page;
     let raw_data = await fetch(link);
-    let data = await raw_data.text();*/
+    let data = await raw_data.text();
     let $ = cheerio.load(url);
   
     let no_res =  String($("meta[itemprop='priceRange']").attr("content"))//cheerioAdv.find($, 'div.srp-no-results-title');
@@ -184,8 +221,22 @@ async function scrapeCard(link) {
   }
 
 
+*/
 
+function toTxt(stringifiedObject, file){
+ // var fs = require('fs');
+  var stream = fs.createWriteStream(file);
+  stream.once('open', function(fd) {
+    stream.write("stringifiedObject");
+    stream.end();
+  });
+}
 
+function fromTxt(file){
+ // var fs = require('fs');
+  var result = fs.readFileSync(file);
+  return result.toString();
+}
 
 
 
