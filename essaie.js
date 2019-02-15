@@ -166,6 +166,7 @@ async function faireJson ()
     for(var i=0;i<tab.length;i+=1)
     {
         await tabjson.push(jsoniser(tab[i].name_castle,tab[i].name_chef,tab[i].url,tab[i].prix));
+
      }
 
 
@@ -183,7 +184,9 @@ async function faireJson ()
 
 async function jsoniser(tab1,tab2,tab3,tab4){
     
-    return await JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
+    var blop55 =await  JSON.stringify({ nom_chateau: tab1, nom_chef: tab2, adresse_url: tab3, prix: tab4 });
+    fs.writeFile("../JSONFiles/relaischat.json",blop55, function doneWriting(err){if(err){console.log(err);}});
+    return  blop55;
 
 }
 
@@ -237,6 +240,8 @@ function fromTxt(file){
   var result = fs.readFileSync(file);
   return result.toString();
 }
+
+
 
 
 
